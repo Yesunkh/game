@@ -1,17 +1,16 @@
-import java.util.*;
-import javax.swing.*;
+
 import java.util.List;
 import java.util.ArrayList;
-import java.io.*;
+
 
 public class Polygon {
 
     List<Triangle> tris;
-    int color;
+    Color color;
     public Polygon() {
         tris = new ArrayList<Triangle>();
     }
-    public Polygon(int color) {
+    public Polygon(Color color) {
         this();
         this.color = color;
     }
@@ -21,10 +20,10 @@ public class Polygon {
     public List<Triangle> getTriangles() {
         return tris;
     }
-    public int getColor() {
+    public Color getColor() {
         return color;
     }
-    public void setColor(int color) {
+    public void setColor(Color color) {
         this.color = color;
     }
     public void rotate(double alpha, double beta, double gamma) {
@@ -37,7 +36,7 @@ public class Polygon {
             tri.translate(x,y,z);
         }
     }
-    public void project2Grid(float theta, float renderDistance, int[][] grid, float tempTranslate){
+    public void project2GridTransparent(float theta, float renderDistance, int[][] grid, float tempTranslate){
         //remove tempTranslate later on, when cropping implemented
         //also renderdistance cropping isn't enabled yet
         for (Triangle tri : tris) {
@@ -45,9 +44,61 @@ public class Polygon {
             int[] v1 = {projectX(theta, renderDistance, grid, tri.getA().getX(), tri.getA().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getA().getY(), tri.getA().getZ(), scalar, tempTranslate)};
             int[] v2 = {projectX(theta, renderDistance, grid, tri.getB().getX(), tri.getB().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getB().getY(), tri.getB().getZ(), scalar, tempTranslate)};
             int[] v3 = {projectX(theta, renderDistance, grid, tri.getC().getX(), tri.getC().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getC().getY(), tri.getC().getZ(), scalar, tempTranslate)};
-            drawLine(v1[0], v1[1], v2[0], v2[1],getColor(), grid);
-            drawLine(v2[0], v2[1], v3[0], v3[1],getColor(), grid);
-            drawLine(v3[0], v3[1], v1[0], v1[1],getColor(), grid);
+            drawLine(v1[0], v1[1], v2[0], v2[1],color.getRGB(), grid);
+            drawLine(v2[0], v2[1], v3[0], v3[1],color.getRGB(), grid);
+            drawLine(v3[0], v3[1], v1[0], v1[1],color.getRGB(), grid);
+        }
+    }
+    public void project2Grid(float theta, float renderDistance, int[][] grid, Vertice cameraV, float tempTranslate){
+        //remove tempTranslate later on, when cropping implemented
+        //also renderdistance cropping isn't enabled yet
+        for (Triangle tri : tris) {
+            Utility utility = new Utility();
+            if(utility.isTriangleAligned(tri, cameraV)){
+                float scalar = 1000;
+                int[] v1 = {projectX(theta, renderDistance, grid, tri.getA().getX(), tri.getA().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getA().getY(), tri.getA().getZ(), scalar, tempTranslate)};
+                int[] v2 = {projectX(theta, renderDistance, grid, tri.getB().getX(), tri.getB().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getB().getY(), tri.getB().getZ(), scalar, tempTranslate)};
+                int[] v3 = {projectX(theta, renderDistance, grid, tri.getC().getX(), tri.getC().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getC().getY(), tri.getC().getZ(), scalar, tempTranslate)};
+                drawLine(v1[0], v1[1], v2[0], v2[1],color.getRGB(), grid);
+                drawLine(v2[0], v2[1], v3[0], v3[1],color.getRGB(), grid);
+                drawLine(v3[0], v3[1], v1[0], v1[1],color.getRGB(), grid);
+            }
+
+        }
+    }
+    public void project2GridSortedRasterized(float theta, float renderDistance, int[][] grid, Vertice cameraV, Vertice lightV, float tempTranslate){
+        //remove tempTranslate later on, when cropping implemented
+        //also renderdistance cropping isn't enabled yet
+        Utility utility = new Utility();
+        List<Triangle> trisSorted = new ArrayList<Triangle>();
+        //is triangle dot product in visible range?
+        for (Triangle tri : tris) {
+            if (utility.isTriangleAligned(tri, cameraV)){
+                trisSorted.add(tri);
+            }
+        }
+
+        //sort algorithm for drawing triangles furthest in front
+        trisSorted = utility.sortTriangles(trisSorted, cameraV);
+        for (Triangle tri : trisSorted) {
+                float scalar = 1000;
+                int[] v1 = {projectX(theta, renderDistance, grid, tri.getA().getX(), tri.getA().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getA().getY(), tri.getA().getZ(), scalar, tempTranslate)};
+                int[] v2 = {projectX(theta, renderDistance, grid, tri.getB().getX(), tri.getB().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getB().getY(), tri.getB().getZ(), scalar, tempTranslate)};
+                int[] v3 = {projectX(theta, renderDistance, grid, tri.getC().getX(), tri.getC().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getC().getY(), tri.getC().getZ(), scalar, tempTranslate)};
+                Vertice vertice1 = new Vertice(v1[0], v1[1], 0);
+                Vertice vertice2 = new Vertice(v2[0], v2[1], 0);
+                Vertice vertice3 = new Vertice(v3[0], v3[1], 0);
+                float alignment = utility.howMuchIsTriangleAligned(tri, lightV);
+                int shade = color.lighten((int)(-alignment * 20));
+
+                utility.rasterizeTriangle(grid,vertice1, vertice2,vertice3, shade);
+                /*
+            drawLine(v1[0], v1[1], v2[0], v2[1],20, grid);
+            drawLine(v2[0], v2[1], v3[0], v3[1],20, grid);
+            drawLine(v3[0], v3[1], v1[0], v1[1],20, grid);
+
+                 */
+
         }
     }
     public int projectX(float theta ,float renderDistance, int[][] grid, float x, float Z, float scalar, float tempTranslate){
@@ -94,120 +145,4 @@ public class Polygon {
         }
     }
 }
-
-
-
-/*
-
-public class Triangle{
-
-    Vertice a, b ,c;
-    public Triangle(Vertice a, Vertice b, Vertice c){
-        this.a = a;
-        this.b = b;
-        this.c = c;
-    }
-    public Vertice getA(){
-        return a;
-    }
-    public Vertice getB(){
-        return b;
-    }
-    public Vertice getC(){
-        return c;
-    }
-    public void setA(Vertice a){
-        this.a = a;
-
-    }
-    public void setB(Vertice b){
-        this.b = b;
-    }
-    public void setC(Vertice c){
-        this.c = c;
-    }
-    public void rotate(double alpha, double beta, double gamma){
-
-        getA().rotateX(alpha);
-        getA().rotateY(beta);
-        getA().rotateZ(gamma);
-        getB().rotateX(alpha);
-        getB().rotateY(beta);
-        getB().rotateZ(gamma);
-        getC().rotateX(alpha);
-        getC().rotateY(beta);
-        getC().rotateZ(gamma);
-    }
-    public void translate(float x, float y, float z){
-        getA().translate(x,y,z);
-        getB().translate(x,y,z);
-        getC().translate(x,y,z);
-    }
-}
-
-class Vertice{
-    float x, y, z;
-    public Vertice(float x, float y, float z){
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-    public float getX() {
-        return x;
-    }
-    public float getY() {
-        return y;
-    }
-    public float getZ() {
-        return z;
-    }
-    public void setX(float x){
-        this.x = x;
-    }
-    public void setY(float y){
-        this.y = y;
-    }
-    public void setZ(float z){
-        this.z = z;
-    }
-    public void rotateX(double angle){
-        float angleInRadians = (float)Math.toRadians(angle);
-        float[] pos = new float[3];
-        pos[0] = getX();
-        pos[1] = getY() * (float)Math.cos(angleInRadians) + getZ() * (float)(-Math.sin(angleInRadians));
-        pos[2] = getZ() * (float)Math.cos(angleInRadians) + getY() * (float)Math.sin(angleInRadians);
-        setX(pos[0]);
-        setY(pos[1]);
-        setZ(pos[2]);
-    }
-    public void rotateY(double angle){
-        float angleInRadians = (float)Math.toRadians(angle);
-        float[] pos = new float[3];
-        pos[0] = getX() * (float)Math.cos(angleInRadians) + getZ() * (float)(-Math.sin(angleInRadians));
-        pos[1] = getY();
-        pos[2] = getZ() * (float)Math.cos(angleInRadians) + getX() * (float)Math.sin(angleInRadians);
-        setX(pos[0]);
-        setY(pos[1]);
-        setZ(pos[2]);
-    }
-    public void rotateZ(double angle){
-        float angleInRadians = (float)Math.toRadians(angle);
-        float[] pos = new float[3];
-        pos[0] = getX() * (float)Math.cos(angleInRadians) + getY() * (float)(-Math.sin(angleInRadians));
-        pos[1] = getY() * (float)Math.cos(angleInRadians) + getX() * (float)Math.sin(angleInRadians);
-        pos[2] = getZ();
-        setX(pos[0]);
-        setY(pos[1]);
-        setZ(pos[2]);
-    }
-    public void translate(float x, float y, float z){
-        setX(getX()+x);
-        setY(getY()+y);
-        setZ(getZ()+z);
-    }
-}
-
-
- */
-
 
