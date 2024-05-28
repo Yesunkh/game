@@ -84,10 +84,13 @@ public class Utility {
     }
 
     public void rasterizeTriangle(int[][] grid, Vertice v0, Vertice v1, Vertice v2, int color) {
-        int minX = (int)Math.min(Math.min(v0.getX(), v1.getX()), v2.getX());
-        int minY = (int)Math.min(Math.min(v0.getY(), v1.getY()), v2.getY());
-        int maxX = (int)Math.max(Math.max(v0.getX(), v1.getX()), v2.getX());
-        int maxY = (int)Math.max(Math.max(v0.getY(), v1.getY()), v2.getY());
+        int width = grid.length;
+        int height = grid[0].length;
+
+        int minX = (int)Math.max(0, Math.min(Math.min(v0.getX(), v1.getX()), v2.getX()));
+        int minY = (int)Math.max(0, Math.min(Math.min(v0.getY(), v1.getY()), v2.getY()));
+        int maxX = (int)Math.min(width - 1, Math.max(Math.max(v0.getX(), v1.getX()), v2.getX()));
+        int maxY = (int)Math.min(height - 1, Math.max(Math.max(v0.getY(), v1.getY()), v2.getY()));
 
         for (int y = minY; y <= maxY; y++) {
             for (int x = minX; x <= maxX; x++) {
