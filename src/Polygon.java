@@ -31,41 +31,7 @@ public class Polygon {
             tri.rotate(alpha, beta, gamma);
         }
     }
-    public void translate(float x, float y, float z) {
-        for (Triangle tri : tris) {
-            tri.translate(x,y,z);
-        }
-    }
-    public void project2GridTransparent(float theta, float renderDistance, int[][] grid, float tempTranslate){
-        //remove tempTranslate later on, when cropping implemented
-        //also renderdistance cropping isn't enabled yet
-        for (Triangle tri : tris) {
-            float scalar = 1000;
-            int[] v1 = {projectX(theta, renderDistance, grid, tri.getA().getX(), tri.getA().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getA().getY(), tri.getA().getZ(), scalar, tempTranslate)};
-            int[] v2 = {projectX(theta, renderDistance, grid, tri.getB().getX(), tri.getB().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getB().getY(), tri.getB().getZ(), scalar, tempTranslate)};
-            int[] v3 = {projectX(theta, renderDistance, grid, tri.getC().getX(), tri.getC().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getC().getY(), tri.getC().getZ(), scalar, tempTranslate)};
-            drawLine(v1[0], v1[1], v2[0], v2[1],color.getRGB(), grid);
-            drawLine(v2[0], v2[1], v3[0], v3[1],color.getRGB(), grid);
-            drawLine(v3[0], v3[1], v1[0], v1[1],color.getRGB(), grid);
-        }
-    }
-    public void project2Grid(float theta, float renderDistance, int[][] grid, Vertice cameraV, float tempTranslate){
-        //remove tempTranslate later on, when cropping implemented
-        //also renderdistance cropping isn't enabled yet
-        for (Triangle tri : tris) {
-            Utility utility = new Utility();
-            if(utility.isTriangleAligned(tri, cameraV)){
-                float scalar = 1000;
-                int[] v1 = {projectX(theta, renderDistance, grid, tri.getA().getX(), tri.getA().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getA().getY(), tri.getA().getZ(), scalar, tempTranslate)};
-                int[] v2 = {projectX(theta, renderDistance, grid, tri.getB().getX(), tri.getB().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getB().getY(), tri.getB().getZ(), scalar, tempTranslate)};
-                int[] v3 = {projectX(theta, renderDistance, grid, tri.getC().getX(), tri.getC().getZ(), scalar, tempTranslate), projectY(theta, renderDistance, grid, tri.getC().getY(), tri.getC().getZ(), scalar, tempTranslate)};
-                drawLine(v1[0], v1[1], v2[0], v2[1],color.getRGB(), grid);
-                drawLine(v2[0], v2[1], v3[0], v3[1],color.getRGB(), grid);
-                drawLine(v3[0], v3[1], v1[0], v1[1],color.getRGB(), grid);
-            }
 
-        }
-    }
     public void project2GridSortedRasterized(float theta, float renderDistance, int[][] grid, Vertice cameraV, Vertice lightV, float tempTranslate){
         //remove tempTranslate later on, when cropping implemented
         //also renderdistance cropping isn't enabled yet

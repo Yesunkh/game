@@ -23,7 +23,7 @@ public class Main {
 
 
         try{
-            String filepath = "testobj/chair.obj";
+            String filepath = "testobj/icosphere.obj";
             Polygon polygon = OBJParser.parseOBJFile(filepath);
             polygon.setColor(color);
             //polygon.translate(0,0,10);
