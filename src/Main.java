@@ -1,32 +1,41 @@
 import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
 
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
+        frame.setSize(1000, 1000);
         frame.setLocationRelativeTo(null);
 
-        int[][] grid = new int[500][500];
+        int[][] grid = new int[1000][1000];
         DrawImage image = new DrawImage(grid);
 
-        double angle = 0.01;
-        Vertice cameraV = new Vertice(0,0,-10);
-        Vertice lightV = new Vertice(0,0,-10);
+        double angle = 0.1;
+        CameraLight cameraLight = new CameraLight();
+        CustomKeyListener keyListener = new CustomKeyListener(cameraLight, angle );
+        CustomMouseListener mouseListener = new CustomMouseListener(cameraLight);
+        frame.addKeyListener(keyListener);
+        frame.addMouseListener(mouseListener);
+        frame.addMouseMotionListener(mouseListener);
+        cameraLight.translateCamera(0,0,-20);
+        cameraLight.translateLight(0,0,-20);
         Color color = new Color();
-        color.setBlue(10);
-        color.setGreen(10);
-        color.setRed(10);
+        color.setBlue(50);
+        color.setGreen(0);
+        color.setRed(0);
         color.setRGB();
 
 
         try{
-            String filepath = "testobj/icosphere.obj";
+            String filepath = "testobj/UVSphere.obj";
             Polygon polygon = OBJParser.parseOBJFile(filepath);
             polygon.setColor(color);
-            //polygon.translate(0,0,10);
             image.redrawImage(grid);
             frame.add(image);
 
@@ -35,7 +44,8 @@ public class Main {
             while(true){
                 image.clearGrid(grid);
                 polygon.rotate(angle, -angle, angle);
-                polygon.project2GridSortedRasterized(90, 1000, grid, cameraV, lightV,20);
+                keyListener.processKeyEvents();
+                polygon.transformSortProject(90, 1000, grid, cameraLight, 0);
                 image.redrawImage(grid);
 
                 try {
@@ -43,6 +53,8 @@ public class Main {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+
             }
         }
         catch (IOException e){

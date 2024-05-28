@@ -9,6 +9,12 @@ public class Triangle{
         this.b = b;
         this.c = c;
     }
+    public Triangle(Triangle other){
+        setColor(other.getColor());
+        setA(new Vertice(other.getA()));
+        setB(new Vertice(other.getB()));
+        setC(new Vertice(other.getC()));
+    }
     public Vertice getA(){
         return a;
     }

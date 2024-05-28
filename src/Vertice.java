@@ -7,6 +7,11 @@ public class Vertice{
         this.y = y;
         this.z = z;
     }
+    public Vertice(Vertice other){
+        setX(other.getX());
+        setY(other.getY());
+        setZ(other.getZ());
+    }
     public float getX() {
         return x;
     }

@@ -6,6 +6,11 @@ public class Color {
         this.green = 0;
         this.blue = 0;
     }
+    public Color(Color other) {
+        setRed(other.getRed());
+        setGreen(other.getGreen());
+        setBlue(other.getBlue());
+    }
 
     public void setRGB(int rgb) {
         this.rgb = rgb;
