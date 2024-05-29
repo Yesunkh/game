@@ -47,6 +47,11 @@ public class Color {
         int newred = Math.max(0, red - factor);
         int newgreen = Math.max(0, green - factor);
         int newblue = Math.max(0, blue - factor);
+        if (newred > 255 || newgreen > 255 || newblue > 255){
+            newred = 255;
+            newgreen = 255;
+            newblue = 255;
+        }
         return (newred << 16) | (newgreen << 8) | newblue;
 
     }
@@ -54,6 +59,11 @@ public class Color {
         int newred = Math.min(255, red + factor);
         int newgreen = Math.min(255, green + factor);
         int newblue = Math.min(255, blue + factor);
+        if(newred<0 || newgreen<0 || newblue<0){
+            newred = 0;
+            newgreen = 0;
+            newblue = 0;
+        }
         return (newred << 16) | (newgreen << 8) | newblue;
     }
 }

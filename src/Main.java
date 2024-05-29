@@ -23,8 +23,8 @@ public class Main {
         frame.addKeyListener(keyListener);
         frame.addMouseListener(mouseListener);
         frame.addMouseMotionListener(mouseListener);
-        cameraLight.translateCamera(0,0,-20);
-        cameraLight.translateLight(0,0,-20);
+        cameraLight.translateCamera(0,0,-10);
+        cameraLight.translateLight(0,0,-10);
         Color color = new Color();
         color.setBlue(50);
         color.setGreen(0);
@@ -45,7 +45,7 @@ public class Main {
                 image.clearGrid(grid);
                 polygon.rotate(angle, -angle, angle);
                 keyListener.processKeyEvents();
-                polygon.transformSortProject(90, 1000, grid, cameraLight, 0);
+                polygon.transformSortProject(90, 20, grid, cameraLight, 0);
                 image.redrawImage(grid);
 
                 try {
