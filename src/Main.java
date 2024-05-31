@@ -26,9 +26,9 @@ public class Main {
         cameraLight.translateCamera(0,0,-10);
         cameraLight.translateLight(0,0,-10);
         Color color = new Color();
-        color.setBlue(50);
-        color.setGreen(0);
-        color.setRed(0);
+        color.setBlue(10);
+        color.setGreen(10);
+        color.setRed(10);
         color.setRGB();
 
 
